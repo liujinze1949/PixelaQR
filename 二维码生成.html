@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelaQR</title>
+    <title>PixelaQR - Generate</title>
     <script src="https://cdn.staticfile.org/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * {
@@ -25,42 +25,49 @@
             flex-direction: column;
             align-items: center;
             padding: 20px 15px;
-            font-size: 16px;
         }
 
-        /* 统一导航样式 */
+        /* 左对齐导航栏 */
         .mode-switch {
-            text-align: center;
-            margin-bottom: 20px;
-            flex-shrink: 0;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 25px;
+            padding: 0 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .mode-switch a {
-            color: #666;
+            background: #dbe5f4;
+            color: #1a73e8;
+            padding: 8px 20px;
+            border-radius: 20px;
             text-decoration: none;
             font-size: 14px;
-            transition: color 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.3s;
         }
         .mode-switch a:hover {
-            color: #1a73e8;
+            transform: translateY(-1px);
         }
 
         .container {
             width: 100%;
             max-width: 500px;
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         h1 {
             color: #1a73e8;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             font-size: 24px;
-            line-height: 1.3;
         }
 
         .input-group {
@@ -73,14 +80,14 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         button {
             background: #1a73e8;
             color: white;
             border: none;
-            padding: 13px 20px;
+            padding: 13px;
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
@@ -93,39 +100,37 @@
         }
 
         #qrcode {
-            margin: 20px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
+            margin: 25px auto;
+            padding: 15px;
             text-align: center;
         }
 
         @media (max-width: 480px) {
+            .mode-switch {
+                gap: 10px;
+                padding: 0 5px;
+            }
+            .mode-switch a {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
             body {
-                padding: 15px 10px;
-                font-size: 15px;
+                padding: 15px;
             }
             .container {
-                padding: 15px;
-                max-height: calc(100vh - 80px);
+                padding: 20px;
             }
             h1 {
                 font-size: 22px;
-            }
-            input {
-                font-size: 15px;
-                padding: 10px;
-            }
-            button {
-                font-size: 15px;
-                padding: 12px 15px;
             }
         }
     </style>
 </head>
 <body>
     <div class="mode-switch">
-        <a href="过渡2.html">切换到解析</a>
+        <a href="https://vstream.rth1.xyz/">官网-国内</a>
+        <a href="过渡2.html">切换解析</a>
+        <a href="https://vstream.pages.dev/">官网</a>
     </div>
     
     <div class="container">
@@ -172,4 +177,4 @@
         });
     </script>
 </body>
-      </html>
+</html>
