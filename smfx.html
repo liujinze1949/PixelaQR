@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelaQR - Generate</title>
-    <script src="https://cdn.staticfile.org/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>PixelaQR - View</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,9 +13,9 @@
         }
 
         html, body {
-            overflow: hidden;
             height: 100%;
             width: 100%;
+            overflow-y: auto;
         }
 
         body {
@@ -25,9 +25,9 @@
             flex-direction: column;
             align-items: center;
             padding: 20px 15px;
+            min-height: 100vh;
         }
 
-        /* 左对齐导航栏 */
         .mode-switch {
             display: flex;
             gap: 15px;
@@ -70,39 +70,76 @@
             font-size: 24px;
         }
 
-        .input-group {
+        .upload-box {
+            position: relative;
             margin-bottom: 20px;
         }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        button {
+        #upload-btn {
             background: #1a73e8;
             color: white;
-            border: none;
+            width: 100%;
             padding: 13px;
+            border: none;
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
         }
 
-        button:hover {
+        #fileInput {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+        }
+
+        #preview {
+            max-width: 100%;
+            height: auto;
+            display: none;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        #result {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-break: break-all;
+            line-height: 1.5;
+            color: #666666;
+            max-height: 300px;
+            border: 1px solid #eee;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        /* 自定义滚动条样式 */
+        #result::-webkit-scrollbar {
+            width: 8px;
+        }
+        #result::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        #result::-webkit-scrollbar-thumb {
+            background: #1a73e8;
+            border-radius: 4px;
+        }
+        #result::-webkit-scrollbar-thumb:hover {
             background: #1557b0;
         }
 
-        #qrcode {
-            margin: 25px auto;
-            padding: 15px;
-            text-align: center;
+        .result-content {
+            display: block;
+            margin-top: 8px;
+            word-break: break-word;
+            white-space: pre-wrap;
+            color: #1a73e8; 
         }
 
         @media (max-width: 480px) {
@@ -123,58 +160,84 @@
             h1 {
                 font-size: 22px;
             }
+            #result {
+                max-height: 200px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="mode-switch">
         <a href="https://vstream.rth1.xyz/">官网-国内</a>
-        <a href="过渡1.html">切换解析</a>
+        <a href="过渡1.html">切换生成</a>
         <a href="https://vstream.pages.dev/">官网</a>
     </div>
     
     <div class="container">
-        <h1>Generate</h1>
-        <div class="input-group">
-            <input type="text" 
-                   id="qr-input" 
-                   placeholder="输入文本或网址"
-                   autocomplete="off">
-            <button onclick="generateQR()">生成二维码</button>
+        <h1>View</h1>
+        
+        <div class="upload-box">
+            <button id="upload-btn">选择图片文件</button>
+            <input type="file" id="fileInput" accept="image/*">
         </div>
-        <div id="qrcode"></div>
+
+        <img id="preview" alt="图片预览">
+        <div id="result">解析内容...</div>
     </div>
 
     <script>
-        let qrcode = null;
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const result = document.getElementById('result');
 
-        function generateQR() {
-            const input = document.getElementById('qr-input');
-            const text = input.value.trim();
-            
-            if (!text) {
-                alert('请输入内容');
-                return;
-            }
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-            const container = document.getElementById('qrcode');
-            container.innerHTML = '';
+            preview.style.display = 'none';
+            result.innerHTML = '正在解析...';
+            result.style.color = '#666666';
 
-            qrcode = new QRCode(container, {
-                text: text,
-                width: 200,
-                height: 200,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-
-        document.getElementById('qr-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateQR();
-            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                analyzeImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
         });
+
+        function analyzeImage(src) {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                try {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert"
+                    });
+
+                    if (code) {
+                        result.innerHTML = `解析内容：<br><span class="result-content">${code.data}</span>`;
+                        result.style.color = '#1a73e8';
+                        // 自动滚动到底部
+                        result.scrollTop = result.scrollHeight;
+                    } else {
+                        result.textContent = '未检测到二维码';
+                        result.style.color = '#ff4757';
+                    }
+                } catch (error) {
+                    result.innerHTML = '解析失败: ' + error.message;
+                    result.style.color = '#ff4757';
+                }
+            };
+            img.src = src;
+        }
     </script>
 </body>
 </html>
