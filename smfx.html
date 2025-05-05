@@ -31,13 +31,16 @@
         .mode-switch {
             display: flex;
             gap: 15px;
-            justify-content: flex-start;
             width: 100%;
             max-width: 500px;
-            margin: 0 auto 25px;
-            padding: 0 10px;
+            padding: 10px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* 防止导航栏被压缩 */
+            margin-bottom: 20px;
         }
         .mode-switch a {
             background: #dbe5f4;
@@ -145,7 +148,7 @@
         @media (max-width: 480px) {
             .mode-switch {
                 gap: 10px;
-                padding: 0 5px;
+                padding: 8px;
             }
             .mode-switch a {
                 padding: 8px 15px;
