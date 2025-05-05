@@ -75,6 +75,7 @@
 
         .input-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         input {
@@ -84,9 +85,36 @@
             border-radius: 8px;
             font-size: 16px;
             margin-bottom: 15px;
+            padding-right: 50px; /* 为下载按钮留出空间 */
         }
 
-        button {
+        #downloadBtn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            width: 34px;
+            height: 34px;
+            border-radius: 20px;
+            background: #1a73e8;
+            border: none;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s;
+        }
+        #downloadBtn:hover {
+            background: #1557b0;
+        }
+        #downloadBtn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        button.generate-btn {
             background: #1a73e8;
             color: white;
             border: none;
@@ -98,7 +126,7 @@
             transition: background 0.3s;
         }
 
-        button:hover {
+        button.generate-btn:hover {
             background: #1557b0;
         }
 
@@ -126,6 +154,11 @@
             h1 {
                 font-size: 22px;
             }
+            #downloadBtn {
+                right: 6px;
+                width: 32px;
+                height: 32px;
+            }
         }
     </style>
 </head>
@@ -143,13 +176,19 @@
                    id="qr-input" 
                    placeholder="输入文本或网址"
                    autocomplete="off">
-            <button onclick="generateQR()">生成二维码</button>
+            <button id="downloadBtn" title="下载二维码">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+            </button>
         </div>
+        <button class="generate-btn" onclick="generateQR()">生成二维码</button>
         <div id="qrcode"></div>
     </div>
 
     <script>
         let qrcode = null;
+        const downloadBtn = document.getElementById('downloadBtn');
 
         function generateQR() {
             const input = document.getElementById('qr-input');
@@ -171,7 +210,29 @@
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H
             });
+
+            // 显示下载按钮
+            downloadBtn.style.display = 'block';
         }
+
+        // 下载二维码
+        downloadBtn.addEventListener('click', function() {
+            if (!qrcode) {
+                alert('请先生成二维码');
+                return;
+            }
+
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) return;
+
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `qrcode_${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
 
         document.getElementById('qr-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
